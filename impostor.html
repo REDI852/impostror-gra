@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Tajniak</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+textarea, input {
+    width: 90%;
+    font-size: 16px;
+}
+button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin-top: 15px;
+}
+#haslo {
+    font-size: 28px;
+    margin-top: 20px;
+}
+</style>
+</head>
+<body>
+
+<h2>Tajniak</h2>
+
+<div id="start">
+    <p>Ilość graczy:</p>
+    <input type="number" id="gracze" value="5" min="3">
+
+    <p>Słowa (jedno w linii):</p>
+
+    <textarea id="slowa" rows="8" style="display:none;"></textarea>
+
+    <br>
+    <button onclick="pokazSlowa()">👁️ Pokaż / Ukryj słowa</button>
+
+    <br><br>
+    <button onclick="start()">Start</button>
+</div>
+
+<div id="gra" style="display:none;">
+    <h3 id="info"></h3>
+    <button onclick="pokaz()">Pokaż hasło</button>
+    <div id="haslo"></div>
+    <br>
+    <button onclick="dalej()" style="display:none;">Podaj telefon dalej</button>
+</div>
+
+<script>
+let liczbaGraczy;
+let aktualny = 0;
+let oszust;
+let slowo;
+
+// Wczytaj zapisane słowa z localStorage przy starcie
+window.onload = function() {
+    const zapisane = localStorage.getItem("slowa");
+    if (zapisane) {
+        document.getElementById("slowa").value = zapisane;
+    } else {
+        // przykładowe słowa domyślne
+        document.getElementById("slowa").value = "kot\npies\nsamolot\nnoc\nlas";
+    }
+}
+
+function start() {
+    // zapisz listę słów w localStorage
+    localStorage.setItem("slowa", document.getElementById("slowa").value);
+
+    liczbaGraczy = parseInt(document.getElementById("gracze").value);
+
+    const lista = document.getElementById("slowa").value
+        .split("\n")
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+    if (lista.length === 0) {
+        alert("Musisz wpisać przynajmniej jedno słowo!");
+        return;
+    }
+
+    oszust = Math.floor(Math.random() * liczbaGraczy);
+    slowo = lista[Math.floor(Math.random() * lista.length)];
+
+    document.getElementById("start").style.display = "none";
+    document.getElementById("gra").style.display = "block";
+    pokazInfo();
+}
+
+function pokazInfo() {
+    document.getElementById("info").innerText =
+        "Gracz " + (aktualny + 1);
+    document.getElementById("haslo").innerText = "";
+    document.querySelector("button[onclick='dalej()']").style.display = "none";
+}
+
+function pokaz() {
+    document.getElementById("haslo").innerText =
+        (aktualny === oszust) ? "❌ BRAK HASŁA" : slowo;
+
+    document.querySelector("button[onclick='dalej()']").style.display = "inline";
+}
+
+function dalej() {
+    aktualny++;
+    if (aktualny >= liczbaGraczy) {
+        alert("Wszyscy gracze zobaczyli hasła!");
+        location.reload();
+    } else {
+        pokazInfo();
+    }
+}
+
+function pokazSlowa() {
+    const pole = document.getElementById("slowa");
+    pole.style.display = (pole.style.display === "none") ? "block" : "none";
+}
+</script>
+
+</body>
+</html>
