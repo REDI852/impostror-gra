@@ -28,14 +28,6 @@ button {
 
 <h2>Tajniak</h2>
 
-<h3>wybierz kategorie: </h3> 
-<button class="kategoria"
-oneclick=wybierzkategorie( 'zwierzeta')">
-zwierzeta</button>
-<button class="kategoria"
-oneclick="wybierzkategorie('filmy')">filmy</button>button>
-<button class="kategoria"
-oneclick="wybierzkategorie('mikołów')">mikołów</button>
     
 <div id="start">
    
@@ -66,22 +58,7 @@ let liczbaGraczy;
 let aktualny = 0;
 let oszust;
 let slowo;
-// ⬇⬇⬇ Tutaj dodajemy logikę dla kategorii ⬇⬇⬇
-const kategorie = {
-    Zwierzeta: ["kot", "pies", "lew"],
-    Przedmioty: ["samochód", "stół", "telefon"],
-    Filmy: ["Incepcja", "Matrix", "Avatar"],
-    mikołów: ["rynek", "trąbka", "dnimikołowa"]
-};
 
-let wybranaKategoria = null;
-
-function wybierzKategorie(nazwa) {
-    wybranaKategoria = nazwa;
-    alert("Wybrano kategorię: " + nazwa);
-}
-// ⬆⬆⬆ Koniec logiki kategorii ⬆⬆⬆
-// Wczytaj zapisane słowa z localStorage przy starcie
 window.onload = function() {
     const zapisane = localStorage.getItem("slowa");
     if (zapisane) {
@@ -157,6 +134,7 @@ function pokazSlowa() {
 
 </body>
 </html>
+
 
 
 
