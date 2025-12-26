@@ -3,46 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <title>Tajniak</title>
+
 <style>
 body {
     font-family: Arial, sans-serif;
     text-align: center;
     padding: 20px;
 }
-textarea, input {
+
+input[type="number"] {
     width: 90%;
     font-size: 16px;
+    padding: 5px;
 }
+
 button {
     font-size: 18px;
-    padding: 10px 20px;
+    padding: 10px 25px;
     margin-top: 15px;
+    cursor: pointer;
 }
+
 #haslo {
     font-size: 28px;
     margin-top: 20px;
 }
+
+/* --- Kategorie --- */
+.kategorie {
+    margin-top: 40px;
+}
+
+.kategorie label {
+    display: inline-block;
+    margin: 8px;
+}
+
+.kategorie input {
+    display: none;
+}
+
+.kategorie span {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 8px;
+    background-color: #b6f0b6; /* jasna zieleń */
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.kategorie span:hover {
+    background-color: #8fdd8f; /* ciemniejsza po najechaniu */
+}
+
+.kategorie input:checked + span {
+    background-color: #4caf50; /* zaznaczona */
+    color: white;
+}
 </style>
+
 </head>
 <body>
 
 <h2>Tajniak</h2>
 
-    
 <div id="start">
-   
     <p>Ilość graczy:</p>
     <input type="number" id="gracze" value="5" min="3">
 
-    <p>Słowa (jedno w linii):</p>
-
-    <textarea id="slowa" rows="8" style="display:none;"></textarea>
-
     <br>
-    <button onclick="pokazSlowa()">👁️ Pokaż / Ukryj słowa</button>
+    <button onclick="start()">Graj</button>
 
-    <br><br>
-    <button onclick="start()">Start</button>
+    <div class="kategorie">
+        <p><strong>Wybierz kategorie (dowolna ilość):</strong></p>
+
+        <label>
+            <input type="checkbox" class="kat" value="zwierzeta" checked>
+            <span>Zwierzęta</span>
+        </label>
+
+        <label>
+            <input type="checkbox" class="kat" value="przedmioty">
+            <span>Przedmioty</span>
+        </label>
+
+        <label>
+            <input type="checkbox" class="kat" value="miejsca">
+            <span>Miejsca</span>
+        </label>
+
+        <label>
+            <input type="checkbox" class="kat" value="zawody">
+            <span>Zawody</span>
+        </label>
+
+        <label>
+            <input type="checkbox" class="kat" value="filmy">
+            <span>Filmy</span>
+        </label>
+    </div>
 </div>
 
 <div id="gra" style="display:none;">
@@ -59,43 +119,33 @@ let aktualny = 0;
 let oszust;
 let slowo;
 
-window.onload = function() {
-    const zapisane = localStorage.getItem("slowa");
-    if (zapisane) {
-        document.getElementById("slowa").value = zapisane;
-    } else {
-        // przykładowe słowa domyślne
-        document.getElementById("slowa").value = "kot\npies\nsamolot\nnoc\nlas";
-    }
-}
+const kategorie = {
+    zwierzeta: ["kot", "pies", "lew", "słoń", "żaba"],
+    przedmioty: ["telefon", "klucz", "zegarek", "krzesło", "komputer"],
+    miejsca: ["las", "kino", "plaża", "lotnisko", "szkoła"],
+    zawody: ["lekarz", "kucharz", "policjant", "programista", "nauczyciel"],
+    filmy: ["Titanic", "Matrix", "Incepcja", "Avatar", "Gladiator"]
+};
 
 function start() {
-    // zapisz listę słów w localStorage
-    localStorage.setItem("slowa", document.getElementById("slowa").value);
-
     liczbaGraczy = parseInt(document.getElementById("gracze").value);
 
-    const lista = document.getElementById("slowa").value
-        .split("\n")
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
+    const zaznaczone = [...document.querySelectorAll(".kat:checked")]
+        .map(el => el.value);
 
-    if (lista.length === 0) {
-        alert("Musisz wpisać przynajmniej jedno słowo!");
+    if (zaznaczone.length === 0) {
+        alert("Wybierz przynajmniej jedną kategorię!");
         return;
     }
 
+    let lista = [];
+    zaznaczone.forEach(k => {
+        lista = lista.concat(kategorie[k]);
+    });
+
     oszust = Math.floor(Math.random() * liczbaGraczy);
-    f (wybranaKategoria) {
-    const listaK = kategorie[wybranaKategoria];
-    slowo = listaK[Math.floor(Math.random() * listaK.length)];
-} else {
-    const lista = document.getElementById("slowa").value
-        .split("\n")
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
     slowo = lista[Math.floor(Math.random() * lista.length)];
-}
+    aktualny = 0;
 
     document.getElementById("start").style.display = "none";
     document.getElementById("gra").style.display = "block";
@@ -103,8 +153,7 @@ function start() {
 }
 
 function pokazInfo() {
-    document.getElementById("info").innerText =
-        "Gracz " + (aktualny + 1);
+    document.getElementById("info").innerText = "Gracz " + (aktualny + 1);
     document.getElementById("haslo").innerText = "";
     document.querySelector("button[onclick='dalej()']").style.display = "none";
 }
@@ -125,16 +174,7 @@ function dalej() {
         pokazInfo();
     }
 }
-
-function pokazSlowa() {
-    const pole = document.getElementById("slowa");
-    pole.style.display = (pole.style.display === "none") ? "block" : "none";
-}
 </script>
 
 </body>
 </html>
-
-
-
-
