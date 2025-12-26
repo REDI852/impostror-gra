@@ -27,7 +27,15 @@ button {
 <body>
 
 <h2>Tajniak</h2>
-
+<h3>wybierz kategorie: </h3> 
+<button class="kategoria"
+oneclick=wybierzkategorie( 'zwierzeta')">
+zwierzeta</button>
+<button class="kategoria"
+oneclick="wybierzkategorie('filmy')">filmy</button>button>
+<button class="kategoria"
+oneclick="wybierzkategorie('mikołów')">mikołów</button>
+    
 <div id="start">
     <p>Ilość graczy:</p>
     <input type="number" id="gracze" value="5" min="3">
@@ -56,7 +64,21 @@ let liczbaGraczy;
 let aktualny = 0;
 let oszust;
 let slowo;
+// ⬇⬇⬇ Tutaj dodajemy logikę dla kategorii ⬇⬇⬇
+const kategorie = {
+    Zwierzeta: ["kot", "pies", "lew"],
+    Przedmioty: ["samochód", "stół", "telefon"],
+    Filmy: ["Incepcja", "Matrix", "Avatar"],
+    Jedzenie: ["pizza", "jabłko", "lody"]
+};
 
+let wybranaKategoria = null;
+
+function wybierzKategorie(nazwa) {
+    wybranaKategoria = nazwa;
+    alert("Wybrano kategorię: " + nazwa);
+}
+// ⬆⬆⬆ Koniec logiki kategorii ⬆⬆⬆
 // Wczytaj zapisane słowa z localStorage przy starcie
 window.onload = function() {
     const zapisane = localStorage.getItem("slowa");
@@ -85,7 +107,16 @@ function start() {
     }
 
     oszust = Math.floor(Math.random() * liczbaGraczy);
+    f (wybranaKategoria) {
+    const listaK = kategorie[wybranaKategoria];
+    slowo = listaK[Math.floor(Math.random() * listaK.length)];
+} else {
+    const lista = document.getElementById("slowa").value
+        .split("\n")
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
     slowo = lista[Math.floor(Math.random() * lista.length)];
+}
 
     document.getElementById("start").style.display = "none";
     document.getElementById("gra").style.display = "block";
@@ -124,3 +155,4 @@ function pokazSlowa() {
 
 </body>
 </html>
+
