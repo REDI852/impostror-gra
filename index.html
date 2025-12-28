@@ -11,10 +11,10 @@ body {
     padding: 20px;
 }
 
-input[type="number"], select, textarea {
+input[type="number"], select {
     width: 90%;
     font-size: 16px;
-    padding: 6px;
+    padding: 5px;
 }
 
 button {
@@ -29,7 +29,6 @@ button {
     margin-top: 20px;
 }
 
-/* Kategorie */
 .kategorie {
     margin-top: 40px;
 }
@@ -61,14 +60,6 @@ button {
     background-color: #4caf50;
     color: white;
 }
-
-/* Edytor */
-#editor {
-    display: none;
-    margin-top: 30px;
-    border-top: 2px dashed #ccc;
-    padding-top: 20px;
-}
 </style>
 </head>
 <body>
@@ -77,27 +68,25 @@ button {
 
 <div id="start">
     <p>Ilość graczy:</p>
-    <input type="number" id="gracze" value="5" min="3">
+    <input type="number" id="gracze" min="3">
 
     <p>Tryb impostorów:</p>
     <select id="trybImpostora">
         <option value="1">1 impostor</option>
         <option value="2">2 impostorów</option>
-        <option value="losowo" selected>Losowo</option>
+        <option value="losowo">Losowo</option>
     </select>
 
     <br>
     <button onclick="start()">Graj</button>
 
-    <div class="kategorie" id="kategorieBox"></div>
-
-    <br>
-    <button onclick="toggleEditor()">⚙ Edytuj kategorie</button>
-
-    <div id="editor">
-        <p><strong>Edytuj kategorie (format: Kategoria: słowo, słowo)</strong></p>
-        <textarea id="editorText" rows="8"></textarea><br>
-        <button onclick="zapiszKategorie()">Zapisz</button>
+    <div class="kategorie">
+        <p><strong>Wybierz kategorie:</strong></p>
+        <label><input type="checkbox" class="kat" value="zwierzeta"><span>Zwierzęta</span></label>
+        <label><input type="checkbox" class="kat" value="przedmioty"><span>Przedmioty</span></label>
+        <label><input type="checkbox" class="kat" value="miejsca"><span>Miejsca</span></label>
+        <label><input type="checkbox" class="kat" value="zawody"><span>Zawody</span></label>
+        <label><input type="checkbox" class="kat" value="filmy"><span>Filmy</span></label>
     </div>
 </div>
 
@@ -116,62 +105,27 @@ let impostorzy = [];
 let slowo;
 let chaos = false;
 
-/* ===== KATEGORIE ===== */
-let kategorie = JSON.parse(localStorage.getItem("kategorie")) || {
-    Zwierzęta: ["kot", "pies", "lew"],
-    Miejsca: ["las", "kino", "plaża"],
-    Zawody: ["lekarz", "kucharz"],
-    Gry: ["Minecraft", "GTA"],
-    Filmy: ["Matrix", "Titanic"]
+const kategorie = {
+    zwierzeta: ["kot", "pies", "lew", "słoń", "żaba"],
+    przedmioty: ["telefon", "klucz", "zegarek", "krzesło", "komputer"],
+    miejsca: ["las", "kino", "plaża", "lotnisko", "szkoła"],
+    zawody: ["lekarz", "kucharz", "policjant", "programista", "nauczyciel"],
+    filmy: ["Titanic", "Matrix", "Incepcja", "Avatar", "Gladiator"]
 };
 
-function renderKategorie() {
-    const box = document.getElementById("kategorieBox");
-    box.innerHTML = "<p><strong>Wybierz kategorie:</strong></p>";
+/* ===== PRZYWRACANIE USTAWIEŃ ===== */
+window.onload = () => {
+    const s = JSON.parse(localStorage.getItem("ustawienia"));
+    if (!s) return;
 
-    Object.keys(kategorie).forEach((kat, i) => {
-        const id = "kat_" + i;
-        box.innerHTML += `
-            <label>
-                <input type="checkbox" class="kat" value="${kat}" checked>
-                <span>${kat}</span>
-            </label>
-        `;
+    document.getElementById("gracze").value = s.gracze;
+    document.getElementById("trybImpostora").value = s.tryb;
+
+    document.querySelectorAll(".kat").forEach(el => {
+        el.checked = s.kategorie.includes(el.value);
     });
-}
+};
 
-renderKategorie();
-
-/* ===== EDYTOR ===== */
-function toggleEditor() {
-    const ed = document.getElementById("editor");
-    ed.style.display = ed.style.display === "none" ? "block" : "none";
-
-    let text = "";
-    for (let k in kategorie) {
-        text += `${k}: ${kategorie[k].join(", ")}\n`;
-    }
-    document.getElementById("editorText").value = text;
-}
-
-function zapiszKategorie() {
-    const linie = document.getElementById("editorText").value.split("\n");
-    let nowe = {};
-
-    linie.forEach(l => {
-        if (!l.includes(":")) return;
-        const [kat, slowa] = l.split(":");
-        const lista = slowa.split(",").map(s => s.trim()).filter(Boolean);
-        if (lista.length > 0) nowe[kat.trim()] = lista;
-    });
-
-    kategorie = nowe;
-    localStorage.setItem("kategorie", JSON.stringify(kategorie));
-    renderKategorie();
-    alert("Kategorie zapisane!");
-}
-
-/* ===== GRA ===== */
 function start() {
     liczbaGraczy = parseInt(document.getElementById("gracze").value);
     const tryb = document.getElementById("trybImpostora").value;
@@ -182,10 +136,25 @@ function start() {
         return;
     }
 
+    /* zapisz ustawienia */
+    localStorage.setItem("ustawienia", JSON.stringify({
+        gracze: liczbaGraczy,
+        tryb: tryb,
+        kategorie: zaznaczone
+    }));
+
+    /* losowanie hasła BEZ POWTÓRKI */
     let lista = [];
     zaznaczone.forEach(k => lista = lista.concat(kategorie[k]));
-    slowo = lista[Math.floor(Math.random() * lista.length)];
 
+    let ostatnie = localStorage.getItem("ostatnieHaslo");
+    do {
+        slowo = lista[Math.floor(Math.random() * lista.length)];
+    } while (lista.length > 1 && slowo === ostatnie);
+
+    localStorage.setItem("ostatnieHaslo", slowo);
+
+    /* impostorzy */
     chaos = false;
     impostorzy = [];
 
@@ -193,12 +162,14 @@ function start() {
     if (tryb === "losowo") {
         const r = Math.random();
         if (r < 0.45) ilosc = 1;
-        else if (r < 0.9) ilosc = 2;
+        else if (r < 0.90) ilosc = 2;
         else {
             chaos = true;
             ilosc = liczbaGraczy;
         }
-    } else ilosc = parseInt(tryb);
+    } else {
+        ilosc = parseInt(tryb);
+    }
 
     while (impostorzy.length < ilosc) {
         const i = Math.floor(Math.random() * liczbaGraczy);
