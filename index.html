@@ -11,10 +11,10 @@ body {
     padding: 20px;
 }
 
-input[type="number"] {
+input[type="number"], select, textarea {
     width: 90%;
     font-size: 16px;
-    padding: 5px;
+    padding: 6px;
 }
 
 button {
@@ -62,9 +62,12 @@ button {
     color: white;
 }
 
-/* Impostorzy */
-.impostorzy {
+/* Edytor */
+#editor {
+    display: none;
     margin-top: 30px;
+    border-top: 2px dashed #ccc;
+    padding-top: 20px;
 }
 </style>
 </head>
@@ -86,14 +89,15 @@ button {
     <br>
     <button onclick="start()">Graj</button>
 
-    <div class="kategorie">
-        <p><strong>Wybierz kategorie:</strong></p>
+    <div class="kategorie" id="kategorieBox"></div>
 
-        <label><input type="checkbox" class="kat" value="zwierzeta" checked><span>Zwierzęta</span></label>
-        <label><input type="checkbox" class="kat" value="przedmioty"><span>Przedmioty</span></label>
-        <label><input type="checkbox" class="kat" value="miejsca"><span>Miejsca</span></label>
-        <label><input type="checkbox" class="kat" value="zawody"><span>Zawody</span></label>
-        <label><input type="checkbox" class="kat" value="filmy"><span>Filmy</span></label>
+    <br>
+    <button onclick="toggleEditor()">⚙ Edytuj kategorie</button>
+
+    <div id="editor">
+        <p><strong>Edytuj kategorie (format: Kategoria: słowo, słowo)</strong></p>
+        <textarea id="editorText" rows="8"></textarea><br>
+        <button onclick="zapiszKategorie()">Zapisz</button>
     </div>
 </div>
 
@@ -102,7 +106,7 @@ button {
     <button onclick="pokaz()">Pokaż hasło</button>
     <div id="haslo"></div>
     <br>
-    <button onclick="dalej()" style="display:none;">Podaj telefon dalej!</button>
+    <button onclick="dalej()" style="display:none;">Podaj telefon dalej</button>
 </div>
 
 <script>
@@ -112,19 +116,67 @@ let impostorzy = [];
 let slowo;
 let chaos = false;
 
-const kategorie = {
-    zwierzeta: ["kot", "pies", "lew", "słoń", "żaba"],
-    przedmioty: ["telefon", "klucz", "zegarek", "krzesło", "komputer"],
-    miejsca: ["las", "kino", "plaża", "lotnisko", "szkoła"],
-    zawody: ["lekarz", "kucharz", "policjant", "programista", "nauczyciel"],
-    filmy: ["Titanic", "Matrix", "Incepcja", "Avatar", "Gladiator"]
+/* ===== KATEGORIE ===== */
+let kategorie = JSON.parse(localStorage.getItem("kategorie")) || {
+    Zwierzęta: ["kot", "pies", "lew"],
+    Miejsca: ["las", "kino", "plaża"],
+    Zawody: ["lekarz", "kucharz"],
+    Gry: ["Minecraft", "GTA"],
+    Filmy: ["Matrix", "Titanic"]
 };
 
+function renderKategorie() {
+    const box = document.getElementById("kategorieBox");
+    box.innerHTML = "<p><strong>Wybierz kategorie:</strong></p>";
+
+    Object.keys(kategorie).forEach((kat, i) => {
+        const id = "kat_" + i;
+        box.innerHTML += `
+            <label>
+                <input type="checkbox" class="kat" value="${kat}" checked>
+                <span>${kat}</span>
+            </label>
+        `;
+    });
+}
+
+renderKategorie();
+
+/* ===== EDYTOR ===== */
+function toggleEditor() {
+    const ed = document.getElementById("editor");
+    ed.style.display = ed.style.display === "none" ? "block" : "none";
+
+    let text = "";
+    for (let k in kategorie) {
+        text += `${k}: ${kategorie[k].join(", ")}\n`;
+    }
+    document.getElementById("editorText").value = text;
+}
+
+function zapiszKategorie() {
+    const linie = document.getElementById("editorText").value.split("\n");
+    let nowe = {};
+
+    linie.forEach(l => {
+        if (!l.includes(":")) return;
+        const [kat, slowa] = l.split(":");
+        const lista = slowa.split(",").map(s => s.trim()).filter(Boolean);
+        if (lista.length > 0) nowe[kat.trim()] = lista;
+    });
+
+    kategorie = nowe;
+    localStorage.setItem("kategorie", JSON.stringify(kategorie));
+    renderKategorie();
+    alert("Kategorie zapisane!");
+}
+
+/* ===== GRA ===== */
 function start() {
     liczbaGraczy = parseInt(document.getElementById("gracze").value);
     const tryb = document.getElementById("trybImpostora").value;
 
-    const zaznaczone = [...document.querySelectorAll(".kat:checked")].map(el => el.value);
+    const zaznaczone = [...document.querySelectorAll(".kat:checked")].map(e => e.value);
     if (zaznaczone.length === 0) {
         alert("Wybierz przynajmniej jedną kategorię!");
         return;
@@ -141,14 +193,12 @@ function start() {
     if (tryb === "losowo") {
         const r = Math.random();
         if (r < 0.45) ilosc = 1;
-        else if (r < 0.90) ilosc = 2;
+        else if (r < 0.9) ilosc = 2;
         else {
             chaos = true;
             ilosc = liczbaGraczy;
         }
-    } else {
-        ilosc = parseInt(tryb);
-    }
+    } else ilosc = parseInt(tryb);
 
     while (impostorzy.length < ilosc) {
         const i = Math.floor(Math.random() * liczbaGraczy);
@@ -168,25 +218,16 @@ function pokazInfo() {
 }
 
 function pokaz() {
-    let tekst;
-    if (chaos) {
-        tekst = "❌ BRAK HASŁA";
-    } else {
-        tekst = impostorzy.includes(aktualny) ? "❌ BRAK HASŁA" : slowo;
-    }
+    document.getElementById("haslo").innerText =
+        (chaos || impostorzy.includes(aktualny)) ? "❌ BRAK HASŁA" : slowo;
 
-    document.getElementById("haslo").innerText = tekst;
     document.querySelector("button[onclick='dalej()']").style.display = "inline";
 }
 
 function dalej() {
     aktualny++;
-    if (aktualny >= liczbaGraczy) {
-        alert("Wszyscy gracze zobaczyli hasła!");
-        location.reload();
-    } else {
-        pokazInfo();
-    }
+    if (aktualny >= liczbaGraczy) location.reload();
+    else pokazInfo();
 }
 </script>
 
