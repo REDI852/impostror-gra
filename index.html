@@ -106,10 +106,10 @@ let slowo;
 let chaos = false;
 
 const kategorie = {
-    mikolow: ["rynek", "trąbka", "dworzec", "silver", "fresh", "szkoła 1", "szkoła 3"],
-    marki: ["apple", "ferrari", "orbit", "Axe", "dyson", "zelmer", "level up", "simens", "bmw", "tymbark"],
-    miejsca: ["działka", "bielsko", "istebna", "passat", "dom antka", "kaśka/pole", "mcdonald's", "lodowisko"],
-    swieta: ["nit mi w tym domu nie pomaga!!!", "piernik", "pieniadze", "mikołaj", "ręka jak młotek", "śnieg?", "mandarynki", "jarmark", "kolendy"],
+    mikolow: ["rynek", "trąbka", "dworzec", "silver", "fresh", "szkoła 1", "szkoła 3"]
+    marki: ["apple", "ferrari", "orbit", "Axe", "dyson", "zelmer", "level up", "simens", "bmw", "tymbark"]
+    miejsca: ["działka", "bielsko", "istebna", "passat", "dom antka", "kaśka/pole", "mcdonald's", "lodowisko"]
+    swieta: ["nit mi w tym domu nie pomaga!!!", "piernik", "pieniadze", "mikołaj", "ręka jak młotek", "śnieg?", "mandarynki", "jarmark", "kolendy"]
     filmy: ["Titanic", "Matrix", "Star Wars", "Avatar", "Hitman", "Szybcy i Wściekli", "Furioza", "Breaking Bad"]
 };
 
@@ -120,7 +120,6 @@ window.onload = () => {
 
     document.getElementById("gracze").value = s.gracze;
     document.getElementById("trybImpostora").value = s.tryb;
-
     document.querySelectorAll(".kat").forEach(el => {
         el.checked = s.kategorie.includes(el.value);
     });
@@ -204,3 +203,4 @@ function dalej() {
 
 </body>
 </html>
+
