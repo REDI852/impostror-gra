@@ -5,23 +5,21 @@
 <title>Tajniak</title>
 <style>
 body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-input[type="number"], select { width: 90%; font-size: 16px; padding: 5px; }
+input, select { width: 90%; font-size: 16px; padding: 5px; }
 button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer; }
-#haslo { font-size: 28px; margin-top: 20px; }
+#haslo { font-size: 28px; margin-top: 10px; }
+#oszust { font-weight: bold; color: #c62828; margin-top: 15px; }
 .kategorie { margin-top: 40px; }
 .kategorie label { display: inline-block; margin: 8px; }
 .kategorie input { display: none; }
 .kategorie span {
-    display: inline-block;
     padding: 12px 20px;
     border-radius: 8px;
-    background-color: #b6f0b6;
-    cursor: pointer;
+    background: #b6f0b6;
     font-weight: bold;
-    transition: 0.2s;
+    cursor: pointer;
 }
-.kategorie span:hover { background-color: #8fdd8f; }
-.kategorie input:checked + span { background-color: #4caf50; color: white; }
+.kategorie input:checked + span { background:#4caf50; color:#fff; }
 </style>
 </head>
 <body>
@@ -36,17 +34,17 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
     <select id="trybImpostora">
         <option value="1">1 impostor</option>
         <option value="2">2 impostorów</option>
-        <option value="losowo" selected>Losowo</option>
+        <option value="losowo">Losowo</option>
     </select>
 
     <br>
     <button onclick="start()">Graj</button>
-
     <div class="kategorie" id="kategorieBox"></div>
 </div>
 
 <div id="gra" style="display:none;">
     <h3 id="info"></h3>
+    <div id="oszust"></div>
     <button onclick="pokaz()">Pokaż hasło</button>
     <div id="haslo"></div>
     <br>
@@ -54,149 +52,112 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
 </div>
 
 <script>
-let liczbaGraczy, aktualny = 0, impostorzy = [], slowo, chaos = false;
+let liczbaGraczy, aktualny=0, impostorzy=[], slowo;
 
-/* ===== KATEGORIE I HASŁA ===== */
-let kategorie = {
-    mikolow: [
-        "rynek","trąbka","dworzec","silver","fresh",
-        "szkoła 1","szkoła 3",
-        "plac 750 lecia","altana klonowa","orlik 10","niva"
+/* ===== KATEGORIE ===== */
+const kategorie = {
+    mikolow:["rynek","trąbka","dworzec","silver","fresh","szkoła 1","szkoła 3"],
+    miejsca:["działka","bielsko","istebna","passat","lodowisko"],
+    swieta:["piernik","mikołaj","mandarynki","uszka","opłatek"],
+    filmy:[
+        "Titanic","Matrix","Breaking Bad","Incepcja","Interstellar",
+        "Dark","Gra o Tron","Avatar","Star Wars","Furioza","Narcos"
     ],
-
-    marki: [
-        "apple","ferrari","orbit","Axe","dyson","zelmer",
-        "level up","simens","bmw","tymbark",
-        "perwol","pampers","sony","tesla","cat","sprite",
-        "ibuprom","wołga","star","legia warszawa",
-        "real madryt","orange","T mobil","tauron","panasonic",
-
-        "nike","adidas","coca cola","pepsi","lego",
-        "samsung","hp","intel","loreal","red bull"
-    ],
-
-    miejsca: [
-        "działka","bielsko","istebna","passat",
-        "dom antka","kaśka/pole","mcdonald's","lodowisko"
-    ],
-
-    swieta: [
-        "nit mi w tym domu nie pomaga!!!","piernik","pieniadze",
-        "mikołaj","ręka jak młotek","śnieg?",
-        "mandarynki","jarmark","kolendy",
-        "uszka","kevin sam w domu","ekspres polarny",
-        "opłatek","sianko"
-    ],
-
-    filmy: [
-        "Titanic","Matrix","Star Wars","Avatar","Hitman",
-        "Szybcy i Wściekli","Furioza","Breaking Bad",
-
-        "Incepcja","Interstellar","Joker",
-        "Dark","Narcos","The Witcher","Gra o Tron"
+    marki:[
+        "apple","ferrari","orbit","Axe","dyson","zelmer","level up","simens","bmw","tymbark",
+        "perwol","pampers","sony","tesla","cat","sprite","ibuprom","wołga","star",
+        "legia warszawa","real madryt","orange","T mobil","tauron","panasonic",
+        "nike","adidas","coca cola","pepsi","lego","samsung","hp","intel","loreal","red bull",
+        "nvidia","cisowianka","tyskie","lech","microsoft","toyota","audi","kfc","milka","prada",
+        "rolex","youtube","uber","xbox","playstation","nivea","gillette","netflix","bic","jbl",
+        "shell","orlen","nerf","lidl","zalando","aliexpress","temu","twitch","reddit",
+        "cd projekt","oreo","pringles","ikea","canon","gopro"
     ]
 };
 
-/* ===== PODPOWIEDZI DLA MARKI ===== */
+/* ===== PODPOWIEDZI – MARKI ===== */
 const podpowiedziMarki = {
-    apple: "biały",
-    ferrari: "czerwony",
-    orbit: "świeżo",
-    Axe: "zapach",
-    dyson: "powietrze",
-    zelmer: "kuchnia",
-    "level up": "gracze",
-    simens: "technika",
-    bmw: "szybko",
-    tymbark: "owocowo",
-    perwol: "czysto",
-    pampers: "miękko",
-    sony: "ekran",
-    tesla: "prąd",
-    cat: "żółte",
-    sprite: "bąbelki",
-    ibuprom: "ból",
-    wołga: "stare",
-    star: "ciężkie",
-    "legia warszawa": "zielone",
-    "real madryt": "białe",
-    orange: "kolor",
-    "T mobil": "różowe",
-    tauron: "energia",
-    panasonic: "sprzęt",
-
-    nike: "znak",
-    adidas: "paski",
-    "coca cola": "czarne",
-    pepsi: "niebieskie",
-    lego: "klocki",
-    samsung: "ekran",
-    hp: "biuro",
-    intel: "wnętrze",
-    loreal: "włosy",
-    "red bull": "skrzydła"
+apple:"przereklamowany", ferrari:"czerwony", orbit:"oddech", axe:"zapach", dyson:"baterie",
+zelmer:"kuchnia", "level up":"kiedyś klasa", simens:"fabryka", bmw:"niemiecki",
+tymbark:"kartonik", perwol:"delikatne", pampers:"przyjemnosc", sony:"ekran",
+tesla:"prąd", cat:"żółte", sprite:"bąbelki", ibuprom:"ból", wołga:"stare",
+star:"ciężkie", "legia warszawa":"ostrze", "real madryt":"galaktyczni",
+orange:"sieć", "T mobil":"różowe", tauron:"energia", panasonic:"sprzęt",
+nike:"skrzydło", adidas:"trzy", "coca cola":"święta", pepsi:"niebieskie",
+lego:"plastik", samsung:"android", hp:"druk", intel:"procesor",
+loreal:"włosy", "red bull":"rower", nvidia:"zielone", cisowianka:"butelka",
+tyskie:"menel", lech:"poznan", microsoft:"okna", toyota:"japonia",
+audi:"cztery", kfc:"sraczka", milka:"fiolet", prada:"drogo", rolex:"złoto",
+youtube:"play", uber:"aplikacja", xbox:"pad", playstation:"granat",
+nivea:"krem", gillette:"ostrze", netflix:"serial", bic:"jednorazowe",
+jbl:"głośno", shell:"muszla", orlen:"orzeł", nerf:"pianka", lidl:"tani",
+zalando:"paczka", aliexpress:"długo", temu:"reklamy", twitch:"live",
+reddit:"forum", "cd projekt":"polska", oreo:"ciastko", pringles:"tuba",
+ikea:"szwedzkie", canon:"obiektyw", gopro:"akcja"
 };
 
-/* ===== RENDER KATEGORII ===== */
-function renderKategorie() {
-    const box = document.getElementById("kategorieBox");
-    box.innerHTML = "<p><strong>Wybierz kategorie:</strong></p>";
-    Object.keys(kategorie).forEach(kat => {
-        box.innerHTML += `
-            <label>
-                <input type="checkbox" class="kat" value="${kat}" checked>
-                <span>${kat}</span>
-            </label>
-        `;
+/* ===== RENDER ===== */
+function renderKategorie(){
+    const box=document.getElementById("kategorieBox");
+    box.innerHTML="<p><strong>Wybierz kategorie:</strong></p>";
+    Object.keys(kategorie).forEach(k=>{
+        box.innerHTML+=`<label><input type="checkbox" class="kat" value="${k}"><span>${k}</span></label>`;
     });
 }
 renderKategorie();
 
-/* ===== GRA ===== */
-function start() {
-    liczbaGraczy = parseInt(document.getElementById("gracze").value);
-    const tryb = document.getElementById("trybImpostora").value;
-    const zaznaczone = [...document.querySelectorAll(".kat:checked")].map(e => e.value);
+/* ===== PAMIĘĆ ===== */
+window.onload=()=>{
+    const s=JSON.parse(localStorage.getItem("tajniak"));
+    if(!s)return;
+    gracze.value=s.g;
+    trybImpostora.value=s.t;
+    document.querySelectorAll(".kat").forEach(e=>e.checked=s.k.includes(e.value));
+};
 
-    let lista = [];
-    zaznaczone.forEach(k => lista = lista.concat(kategorie[k]));
-    slowo = lista[Math.floor(Math.random() * lista.length)];
+function start(){
+    liczbaGraczy=+gracze.value;
+    const tryb=trybImpostora.value;
+    const zaz=[...document.querySelectorAll(".kat:checked")].map(e=>e.value);
 
-    impostorzy = [];
-    let ilosc = tryb === "losowo" ? (Math.random() < 0.5 ? 1 : 2) : parseInt(tryb);
-    while (impostorzy.length < ilosc) {
-        const i = Math.floor(Math.random() * liczbaGraczy);
-        if (!impostorzy.includes(i)) impostorzy.push(i);
+    localStorage.setItem("tajniak",JSON.stringify({g:liczbaGraczy,t:tryb,k:zaz}));
+
+    let lista=[];
+    zaz.forEach(k=>lista=lista.concat(kategorie[k]));
+    slowo=lista[Math.floor(Math.random()*lista.length)];
+
+    impostorzy=[];
+    let il=tryb==="losowo"?(Math.random()<0.5?1:2):+tryb;
+    while(impostorzy.length<il){
+        let i=Math.floor(Math.random()*liczbaGraczy);
+        if(!impostorzy.includes(i))impostorzy.push(i);
     }
 
-    aktualny = 0;
-    document.getElementById("start").style.display = "none";
-    document.getElementById("gra").style.display = "block";
+    aktualny=0;
+    start.style.display="none";
+    gra.style.display="block";
     pokazInfo();
 }
 
-function pokazInfo() {
-    document.getElementById("info").innerText = "Gracz " + (aktualny + 1);
-    document.getElementById("haslo").innerText = "";
-    document.querySelector("button[onclick='dalej()']").style.display = "none";
+function pokazInfo(){
+    info.innerText="Gracz "+(aktualny+1);
+    haslo.innerText="";
+    oszust.innerText="";
+    document.querySelector("button[onclick='dalej()']").style.display="none";
 }
 
-function pokaz() {
-    if (impostorzy.includes(aktualny)) {
-        document.getElementById("haslo").innerText =
-            podpowiedziMarki[slowo] ? "🟡 " + podpowiedziMarki[slowo] : "❌ BRAK HASŁA";
-    } else {
-        document.getElementById("haslo").innerText = slowo;
-    }
-    document.querySelector("button[onclick='dalej()']").style.display = "inline";
+function pokaz(){
+    if(impostorzy.includes(aktualny)){
+        oszust.innerText="JESTEŚ OSZUSTEM!";
+        haslo.innerText=podpowiedziMarki[slowo]||"❌ BRAK HASŁA";
+    }else haslo.innerText=slowo;
+    document.querySelector("button[onclick='dalej()']").style.display="inline";
 }
 
-function dalej() {
+function dalej(){
     aktualny++;
-    if (aktualny >= liczbaGraczy) location.reload();
-    else pokazInfo();
+    aktualny>=liczbaGraczy?location.reload():pokazInfo();
 }
 </script>
-
 </body>
 </html>
