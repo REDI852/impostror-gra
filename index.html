@@ -38,17 +38,17 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
     </select>
 
     <br>
-    <button onclick="start()">Graj</button>
+    <button id="btnStart">Graj</button>
     <div class="kategorie" id="kategorieBox"></div>
 </div>
 
 <div id="gra" style="display:none;">
     <h3 id="info"></h3>
     <div id="oszust"></div>
-    <button onclick="pokaz()">Pokaż hasło</button>
+    <button id="btnPokaz">Pokaż hasło</button>
     <div id="haslo"></div>
     <br>
-    <button onclick="dalej()" style="display:none;">Podaj telefon dalej!</button>
+    <button id="btnDalej" style="display:none;">Podaj telefon dalej!</button>
 </div>
 
 <script>
@@ -59,25 +59,22 @@ const kategorie = {
     mikolow:["rynek","trąbka","dworzec","silver","fresh","szkoła 1","szkoła 3"],
     miejsca:["działka","bielsko","istebna","passat","lodowisko"],
     swieta:["piernik","mikołaj","mandarynki","uszka","opłatek"],
-    filmy:[
-        "Titanic","Matrix","Breaking Bad","Incepcja","Interstellar",
-        "Dark","Gra o Tron","Avatar","Star Wars","Furioza","Narcos"
-    ],
-    marki:[
-        "apple","ferrari","orbit","Axe","dyson","zelmer","level up","simens","bmw","tymbark",
+    filmy:[ "Titanic","Matrix","Breaking Bad","Incepcja","Interstellar",
+            "Dark","Gra o Tron","Avatar","Star Wars","Furioza","Narcos" ],
+  
+    marki:[ "apple","ferrari","orbit","Axe","dyson","zelmer","level up","simens","bmw","tymbark",
         "perwol","pampers","sony","tesla","cat","sprite","ibuprom","wołga","star",
         "legia warszawa","real madryt","orange","T mobil","tauron","panasonic",
         "nike","adidas","coca cola","pepsi","lego","samsung","hp","intel","loreal","red bull",
         "nvidia","cisowianka","tyskie","lech","microsoft","toyota","audi","kfc","milka","prada",
         "rolex","youtube","uber","xbox","playstation","nivea","gillette","netflix","bic","jbl",
         "shell","orlen","nerf","lidl","zalando","aliexpress","temu","twitch","reddit",
-        "cd projekt","oreo","pringles","ikea","canon","gopro"
-    ]
+        "cd projekt","oreo","pringles","ikea","canon","gopro" ]
 };
 
-/* ===== PODPOWIEDZI – MARKI ===== */
+/* ===== PODPOWIEDZI MARKI ===== */
 const podpowiedziMarki = {
-apple:"przereklamowany", ferrari:"czerwony", orbit:"oddech", axe:"zapach", dyson:"baterie",
+apple:"przereklamowany", ferrari:"czerwony", orbit:"oddech", Axe:"zapach", dyson:"baterie",
 zelmer:"kuchnia", "level up":"kiedyś klasa", simens:"fabryka", bmw:"niemiecki",
 tymbark:"kartonik", perwol:"delikatne", pampers:"przyjemnosc", sony:"ekran",
 tesla:"prąd", cat:"żółte", sprite:"bąbelki", ibuprom:"ból", wołga:"stare",
@@ -96,7 +93,19 @@ reddit:"forum", "cd projekt":"polska", oreo:"ciastko", pringles:"tuba",
 ikea:"szwedzkie", canon:"obiektyw", gopro:"akcja"
 };
 
-/* ===== RENDER ===== */
+/* ===== ELEMENTY HTML ===== */
+const btnStart = document.getElementById("btnStart");
+const btnPokaz = document.getElementById("btnPokaz");
+const btnDalej = document.getElementById("btnDalej");
+const info = document.getElementById("info");
+const haslo = document.getElementById("haslo");
+const oszust = document.getElementById("oszust");
+const startDiv = document.getElementById("start");
+const graDiv = document.getElementById("gra");
+const graczeInput = document.getElementById("gracze");
+const trybInput = document.getElementById("trybImpostora");
+
+/* ===== RENDER KATEGORII ===== */
 function renderKategorie(){
     const box=document.getElementById("kategorieBox");
     box.innerHTML="<p><strong>Wybierz kategorie:</strong></p>";
@@ -106,58 +115,65 @@ function renderKategorie(){
 }
 renderKategorie();
 
-/* ===== PAMIĘĆ ===== */
+/* ===== PAMIĘĆ USTAWIEŃ ===== */
 window.onload=()=>{
     const s=JSON.parse(localStorage.getItem("tajniak"));
-    if(!s)return;
-    gracze.value=s.g;
-    trybImpostora.value=s.t;
-    document.querySelectorAll(".kat").forEach(e=>e.checked=s.k.includes(e.value));
+    if(!s) return;
+    graczeInput.value = s.g;
+    trybInput.value = s.t;
+    document.querySelectorAll(".kat").forEach(e => e.checked = s.k.includes(e.value));
 };
 
-function start(){
-    liczbaGraczy=+gracze.value;
-    const tryb=trybImpostora.value;
-    const zaz=[...document.querySelectorAll(".kat:checked")].map(e=>e.value);
+/* ===== START GRY ===== */
+btnStart.onclick = () => {
+    liczbaGraczy = +graczeInput.value;
+    const tryb = trybInput.value;
+    const zaznaczone = [...document.querySelectorAll(".kat:checked")].map(e=>e.value);
 
-    localStorage.setItem("tajniak",JSON.stringify({g:liczbaGraczy,t:tryb,k:zaz}));
+    if(zaznaczone.length===0){ alert("Wybierz przynajmniej jedną kategorię!"); return; }
+
+    localStorage.setItem("tajniak", JSON.stringify({g:liczbaGraczy, t:tryb, k:zaznaczone}));
 
     let lista=[];
-    zaz.forEach(k=>lista=lista.concat(kategorie[k]));
-    slowo=lista[Math.floor(Math.random()*lista.length)];
+    zaznaczone.forEach(k=>lista = lista.concat(kategorie[k]));
+    slowo = lista[Math.floor(Math.random()*lista.length)];
 
     impostorzy=[];
-    let il=tryb==="losowo"?(Math.random()<0.5?1:2):+tryb;
-    while(impostorzy.length<il){
+    let ilosc = tryb==="losowo" ? (Math.random()<0.5?1:2) : +tryb;
+    while(impostorzy.length<ilosc){
         let i=Math.floor(Math.random()*liczbaGraczy);
-        if(!impostorzy.includes(i))impostorzy.push(i);
+        if(!impostorzy.includes(i)) impostorzy.push(i);
     }
 
     aktualny=0;
-    start.style.display="none";
-    gra.style.display="block";
+    startDiv.style.display="none";
+    graDiv.style.display="block";
     pokazInfo();
-}
+};
 
+/* ===== POKAZ INFO ===== */
 function pokazInfo(){
-    info.innerText="Gracz "+(aktualny+1);
-    haslo.innerText="";
-    oszust.innerText="";
-    document.querySelector("button[onclick='dalej()']").style.display="none";
+    info.innerText = "Gracz "+(aktualny+1);
+    haslo.innerText = "";
+    oszust.innerText = "";
+    btnDalej.style.display="none";
 }
 
-function pokaz(){
+/* ===== POKAZ HASŁO ===== */
+btnPokaz.onclick = () => {
     if(impostorzy.includes(aktualny)){
-        oszust.innerText="JESTEŚ OSZUSTEM!";
-        haslo.innerText=podpowiedziMarki[slowo]||"❌ BRAK HASŁA";
-    }else haslo.innerText=slowo;
-    document.querySelector("button[onclick='dalej()']").style.display="inline";
-}
+        oszust.innerText = "JESTEŚ OSZUSTEM!";
+        haslo.innerText = podpowiedziMarki[slowo] || "❌ BRAK HASŁA";
+    } else haslo.innerText = slowo;
+    btnDalej.style.display="inline";
+};
 
-function dalej(){
+/* ===== DALEJ ===== */
+btnDalej.onclick = () => {
     aktualny++;
-    aktualny>=liczbaGraczy?location.reload():pokazInfo();
-}
+    if(aktualny>=liczbaGraczy) location.reload();
+    else pokazInfo();
+};
 </script>
 </body>
 </html>
