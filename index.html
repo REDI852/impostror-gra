@@ -8,7 +8,7 @@ body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
 input, select { width: 90%; font-size: 16px; padding: 5px; margin:4px 0; }
 button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer; }
 #haslo { font-size: 28px; margin-top: 10px; }
-#oszust { font-weight: bold; color: #c62828; margin-top: 15px; }
+#oszust { font-weight: bold; margin-top: 15px; }
 .kategorie { margin-top: 30px; }
 .kategorie label { display: inline-block; margin: 6px; }
 .kategorie input { display: none; }
@@ -32,15 +32,9 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
 
     <div id="imionaBox">
         <p><strong>Imiona graczy:</strong></p>
-        <input placeholder="Gracz 1">
-        <input placeholder="Gracz 2">
-        <input placeholder="Gracz 3">
-        <input placeholder="Gracz 4">
-        <input placeholder="Gracz 5">
-        <input placeholder="Gracz 6">
-        <input placeholder="Gracz 7">
-        <input placeholder="Gracz 8">
-        <input placeholder="Gracz 9">
+        <input placeholder="Gracz 1"><input placeholder="Gracz 2"><input placeholder="Gracz 3">
+        <input placeholder="Gracz 4"><input placeholder="Gracz 5"><input placeholder="Gracz 6">
+        <input placeholder="Gracz 7"><input placeholder="Gracz 8"><input placeholder="Gracz 9">
         <input placeholder="Gracz 10">
     </div>
 
@@ -51,9 +45,7 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
         <option value="losowo">Losowo</option>
     </select>
 
-    <br>
     <button id="btnStart">Graj</button>
-
     <div class="kategorie" id="kategorieBox"></div>
 </div>
 
@@ -62,12 +54,11 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
     <div id="oszust"></div>
     <button id="btnPokaz">Pokaż hasło</button>
     <div id="haslo"></div>
-    <br>
     <button id="btnDalej" style="display:none;">Podaj telefon dalej!</button>
 </div>
 
 <script>
-let liczbaGraczy, aktualny=0, impostorzy=[], slowo, imiona=[];
+let liczbaGraczy, aktualny=0, impostorzy=[], slowo, imiona=[], jester=null;
 
 /* ===== KATEGORIE ===== */
 const kategorie = {
@@ -75,50 +66,93 @@ const kategorie = {
     miejsca:["działka","bielsko","istebna","passat","lodowisko"],
     swieta:["piernik","mikołaj","mandarynki","uszka","opłatek"],
     filmy:["Titanic","Matrix","Breaking Bad","Incepcja","Interstellar","Dark","Gra o Tron","Avatar","Star Wars","Furioza","Narcos"],
-    marki:["apple","ferrari","orbit","Axe","dyson","zelmer","level up","simens","bmw","tymbark",
+    marki:[
+        "apple","ferrari","orbit","Axe","dyson","zelmer","level up","simens","bmw","tymbark",
         "perwol","pampers","sony","tesla","cat","sprite","ibuprom","wołga","star",
         "legia warszawa","real madryt","orange","T mobil","tauron","panasonic",
         "nike","adidas","coca cola","pepsi","lego","samsung","hp","intel","loreal","red bull",
         "nvidia","cisowianka","tyskie","lech","microsoft","toyota","audi","kfc","milka","prada",
         "rolex","youtube","uber","xbox","playstation","nivea","gillette","netflix","bic","jbl",
         "shell","orlen","nerf","lidl","zalando","aliexpress","temu","twitch","reddit",
-        "cd projekt","oreo","pringles","ikea","canon","gopro"]
+        "cd projekt","oreo","pringles","ikea","canon","gopro"
+    ]
 };
 
 /* ===== PODPOWIEDZI MARKI ===== */
 const podpowiedziMarki = {
-apple:"przereklamowany", ferrari:"czerwony", orbit:"oddech", Axe:"zapach", dyson:"baterie",
-zelmer:"kuchnia", "level up":"kiedyś klasa", simens:"fabryka", bmw:"niemiecki",
-tymbark:"kartonik", perwol:"delikatne", pampers:"przyjemnosc", sony:"ekran",
-tesla:"prąd", cat:"żółte", sprite:"bąbelki", ibuprom:"ból", wołga:"stare",
-star:"ciężkie", "legia warszawa":"ostrze", "real madryt":"galaktyczni",
-orange:"sieć", "T mobil":"różowe", tauron:"energia", panasonic:"sprzęt",
-nike:"skrzydło", adidas:"trzy", "coca cola":"święta", pepsi:"niebieskie",
-lego:"plastik", samsung:"android", hp:"druk", intel:"procesor",
-loreal:"włosy", "red bull":"rower", nvidia:"zielone", cisowianka:"butelka",
-tyskie:"menel", lech:"poznan", microsoft:"okna", toyota:"japonia",
-audi:"cztery", kfc:"sraczka", milka:"fiolet", prada:"drogo", rolex:"złoto",
-youtube:"play", uber:"aplikacja", xbox:"pad", playstation:"X",
-nivea:"krem", gillette:"ostrze", netflix:"serial", bic:"jednorazowe",
-jbl:"głośno", shell:"muszla", orlen:"orzeł", nerf:"pianka", lidl:"tani",
-zalando:"paczka", aliexpress:"długo", temu:"reklamy", twitch:"live",
-reddit:"forum", "cd projekt":"polska", oreo:"ciastko", pringles:"tuba",
-ikea:"szwedzkie", canon:"czyste", gopro:"akcja"
+apple: "przereklamowany",
+    ferrari: "czerwony",
+    orbit: "oddech",
+    Axe: "zapach",
+    dyson: "baterie",
+    zelmer: "kuchnia",
+    "level up": "kiedyś klasa",
+    simens: "fabryka",
+    bmw: "niemiecki",
+    tymbark: "kartonik",
+    perwol: "delikatne",
+    pampers: "przyjemność",
+    sony: "ekran",
+    tesla: "prąd",
+    cat: "żółte",
+    sprite: "bąbelki",
+    ibuprom: "ból",
+    wołga: "stare",
+    star: "ciężkie",
+    "legia warszawa": "ostrze",
+    "real madryt": "galaktyczni",
+    orange: "sieć",
+    "T mobil": "różowe",
+    tauron: "energia",
+    panasonic: "sprzęt",
+    nike: "skrzydło",
+    adidas: "trzy paski",
+    "coca cola": "święta",
+    pepsi: "niebieskie",
+    lego: "plastik",
+    samsung: "android",
+    hp: "drukarka",
+    intel: "procesor",
+    loreal: "włosy",
+    "red bull": "skrzydła",
+    nvidia: "zielone",
+    cisowianka: "butelka",
+    tyskie: "piwo",
+    lech: "poznań",
+    microsoft: "okna",
+    toyota: "japonia",
+    audi: "cztery",
+    kfc: "kurczak",
+    milka: "fiolet",
+    prada: "drogo",
+    rolex: "złoto",
+    youtube: "play",
+    uber: "aplikacja",
+    xbox: "pad",
+    playstation: "konsola",
+    nivea: "krem",
+    gillette: "ostrze",
+    netflix: "serial",
+    bic: "jednorazowe",
+    jbl: "głośno",
+    shell: "muszla",
+    orlen: "orzeł",
+    nerf: "pianka",
+    lidl: "tani",
+    zalando: "paczka",
+    aliexpress: "długo",
+    temu: "reklamy",
+    twitch: "live",
+    reddit: "forum",
+    "cd projekt": "polska",
+    oreo: "ciastko",
+    pringles: "tuba",
+    ikea: "szwedzkie",
+    canon: "obiektyw",
+    gopro: "akcja"
 };
 
-/* ===== ELEMENTY ===== */
-const btnStart=document.getElementById("btnStart");
-const btnPokaz=document.getElementById("btnPokaz");
-const btnDalej=document.getElementById("btnDalej");
-const info=document.getElementById("info");
-const haslo=document.getElementById("haslo");
-const oszust=document.getElementById("oszust");
-const startDiv=document.getElementById("start");
-const graDiv=document.getElementById("gra");
-const graczeInput=document.getElementById("gracze");
-const trybInput=document.getElementById("trybImpostora");
-
-/* ===== RENDER KATEGORII ===== */
+/* ===== RENDER ===== */
 function renderKategorie(){
     const box=document.getElementById("kategorieBox");
     box.innerHTML="<p><strong>Wybierz kategorie:</strong></p>";
@@ -128,53 +162,33 @@ function renderKategorie(){
 }
 renderKategorie();
 
-/* ===== IMIONA ===== */
-function zapiszImiona(){
-    const inputs=[...document.querySelectorAll("#imionaBox input")];
-    const all=inputs.map((i,idx)=>i.value || `Gracz ${idx+1}`);
-    localStorage.setItem("tajniak_imiona",JSON.stringify(all));
-}
-
-window.onload=()=>{
-    const zapisane=JSON.parse(localStorage.getItem("tajniak_imiona"))||[];
-    document.querySelectorAll("#imionaBox input").forEach((i,idx)=>{
-        i.value=zapisane[idx]||"";
-        i.oninput=zapiszImiona;
-    });
-
-    const s=JSON.parse(localStorage.getItem("tajniak"));
-    if(!s) return;
-    graczeInput.value=s.g;
-    trybInput.value=s.t;
-    document.querySelectorAll(".kat").forEach(e=>e.checked=s.k.includes(e.value));
-};
-
 /* ===== START ===== */
 btnStart.onclick=()=>{
-    liczbaGraczy=+graczeInput.value;
-    const tryb=trybInput.value;
-    const zaznaczone=[...document.querySelectorAll(".kat:checked")].map(e=>e.value);
-    if(!zaznaczone.length){alert("Wybierz kategorię");return;}
-
-    localStorage.setItem("tajniak",JSON.stringify({g:liczbaGraczy,t:tryb,k:zaznaczone}));
-
-    const zapisane=JSON.parse(localStorage.getItem("tajniak_imiona"))||[];
-    imiona=zapisane.slice(0,liczbaGraczy).map((n,i)=>n||`Gracz ${i+1}`);
+    liczbaGraczy=+gracze.value;
+    imiona=[...document.querySelectorAll("#imionaBox input")]
+        .slice(0,liczbaGraczy)
+        .map((i,n)=>i.value||`Gracz ${n+1}`);
 
     let lista=[];
-    zaznaczone.forEach(k=>lista=lista.concat(kategorie[k]));
+    document.querySelectorAll(".kat:checked").forEach(k=>lista=lista.concat(kategorie[k.value]));
     slowo=lista[Math.floor(Math.random()*lista.length)];
 
     impostorzy=[];
-    let ilosc=tryb==="losowo"?(Math.random()<0.5?1:2):+tryb;
+    let ilosc=trybImpostora.value==="losowo"?(Math.random()<0.5?1:2):+trybImpostora.value;
     while(impostorzy.length<ilosc){
         let i=Math.floor(Math.random()*liczbaGraczy);
         if(!impostorzy.includes(i))impostorzy.push(i);
     }
 
+    jester=null;
+    if(Math.random()<0.3){
+        do{ jester=Math.floor(Math.random()*liczbaGraczy); }
+        while(impostorzy.includes(jester));
+    }
+
     aktualny=0;
-    startDiv.style.display="none";
-    graDiv.style.display="block";
+    start.style.display="none";
+    gra.style.display="block";
     pokazInfo();
 };
 
@@ -187,19 +201,23 @@ function pokazInfo(){
 }
 
 btnPokaz.onclick=()=>{
-    if(impostorzy.includes(aktualny)){
+    if(aktualny===jester){
+        oszust.innerText="JESTER – MUSISZ ODPAŚĆ JAKO PIERWSZY";
+        haslo.innerText="🤡";
+    }
+    else if(impostorzy.includes(aktualny)){
         oszust.innerText="JESTEŚ OSZUSTEM!";
         haslo.innerText=podpowiedziMarki[slowo]||"❌ BRAK HASŁA";
-    } else haslo.innerText=slowo;
+    }
+    else haslo.innerText=slowo;
+
     btnDalej.style.display="inline";
 };
 
 btnDalej.onclick=()=>{
     aktualny++;
-    if(aktualny>=liczbaGraczy)location.reload();
-    else pokazInfo();
+    aktualny>=liczbaGraczy?location.reload():pokazInfo();
 };
 </script>
-
 </body>
 </html>
