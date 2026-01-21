@@ -123,7 +123,7 @@ const podpowiedziMarki = {
     "red bull": "skrzydła",
     nvidia: "zielone",
     cisowianka: "butelka",
-    tyskie: "piwo",
+    tyskie: "cudo",
     lech: "poznań",
     microsoft: "okna",
     toyota: "japonia",
@@ -160,36 +160,37 @@ const podpowiedziMarki = {
 
 /* ===== PODPOWIEDZI RZECZY ===== */
 const podpowiedziRzeczy = {
-    "krzesło": "siedzenie",
-    "stół": "posiłek",
-    "lampa": "światło",
-    "telefon": "rozmowa",
-    "komputer": "praca",
-    "książka": "czytanie",
-    "długopis": "pisanie",
-    "okno": "widok",
-    "drzwi": "wejście",
-    "samochód": "podróż",
-    "rower": "ruch",
-    "butelka": "napój",
-    "szklanka": "picie",
-    "widelec": "jedzenie",
-    "nóż": "krojenie",
-    "łyżka": "zupa",
-    "telewizor": "film",
-    "lodówka": "chłodzenie",
-    "pralka": "czyszczenie",
-    "kuchenka": "gotowanie",
-    "łóżko": "sen",
-    "poduszka": "wypoczynek",
-    "kołdra": "ciepło",
-    "lustro": "odbicie",
-    "zegar": "czas",
-    "parasol": "deszcz",
-    "torebka": "noszenie",
-    "portfel": "pieniądze",
-    "klucze": "otwieranie",
-    "okulary": "widzenie"
+    
+  "krzesło": "nogi",
+  "stół": "centrum wydarzeń",
+  "lampa": "wieczór",
+  "telefon": "wibracja",
+  "komputer": "klawiatura",
+  "książka": "cisza",
+  "długopis": "egzamin",
+  "okno": "ucieczka",
+  "drzwi": "granica",
+  "samochód": "korek",
+  "rower": "łańcuch",
+  "butelka": "zakrętka",
+  "szklanka": "krucha",
+  "widelec": "metal",
+  "nóż": "ostrożnie",
+  "łyżka": "okrągła",
+  "telewizor": "pilot",
+  "lodówka": "nocne wizyty",
+  "pralka": "wirowanie",
+  "kuchenka": "gaz",
+  "łóżko": "rano",
+  "poduszka": "kształt",
+  "kołdra": "zimą",
+  "lustro": "prawda",
+  "zegar": "tykanie",
+  "parasol": "nagła decyzja",
+  "torebka": "bałagan",
+  "portfel": "pustka",
+  "klucze": "brzęk",
+  "okulary": "szkło"
 };
 
 /* ===== WSZYSTKIE PODPOWIEDZI ===== */
@@ -284,7 +285,7 @@ btnStart.onclick = () => {
     }
 
     jester = null;
-    if (Math.random() < 0.2) {  // ←←← Zmniejszone prawdopodobieństwo jestera (z 0.3 na 0.2)
+    if (Math.random() < 0.1) {  // ←←← Zmniejszone prawdopodobieństwo jestera (z 0.3 na 0.2)
         do { jester = Math.floor(Math.random() * liczbaGraczy); }
         while (impostorzy.includes(jester));
     }
@@ -342,3 +343,4 @@ document.getElementById("btnReset").onclick = () => {
 </script>
 </body>
 </html>
+
