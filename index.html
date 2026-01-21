@@ -75,6 +75,11 @@ const kategorie = {
         "rolex","youtube","uber","xbox","playstation","nivea","gillette","netflix","bic","jbl",
         "shell","orlen","nerf","lidl","zalando","aliexpress","temu","twitch","reddit",
         "cd projekt","oreo","pringles","ikea","canon","gopro"
+    ],
+    rzeczy: [
+        "krzesło", "stół", "lampa", "telefon", "komputer", "książka", "długopis", "okno", "drzwi", "samochód",
+        "rower", "butelka", "szklanka", "widelec", "nóż", "łyżka", "telewizor", "lodówka", "pralka", "kuchenka",
+        "łóżko", "poduszka", "kołdra", "lustro", "zegar", "parasol", "torebka", "portfel", "klucze", "okulary"
     ]
 };
 
@@ -151,6 +156,43 @@ const podpowiedziMarki = {
     canon: "obiektyw",
     gopro: "akcja"
 };
+
+/* ===== PODPOWIEDZI RZECZY ===== */
+const podpowiedziRzeczy = {
+    "krzesło": "siedzenie",
+    "stół": "posiłek",
+    "lampa": "światło",
+    "telefon": "rozmowa",
+    "komputer": "praca",
+    "książka": "czytanie",
+    "długopis": "pisanie",
+    "okno": "widok",
+    "drzwi": "wejście",
+    "samochód": "podróż",
+    "rower": "ruch",
+    "butelka": "napój",
+    "szklanka": "picie",
+    "widelec": "jedzenie",
+    "nóż": "krojenie",
+    "łyżka": "zupa",
+    "telewizor": "film",
+    "lodówka": "chłodzenie",
+    "pralka": "czyszczenie",
+    "kuchenka": "gotowanie",
+    "łóżko": "sen",
+    "poduszka": "wypoczynek",
+    "kołdra": "ciepło",
+    "lustro": "odbicie",
+    "zegar": "czas",
+    "parasol": "deszcz",
+    "torebka": "noszenie",
+    "portfel": "pieniądze",
+    "klucze": "otwieranie",
+    "okulary": "widzenie"
+};
+
+/* ===== WSZYSTKIE PODPOWIEDZI ===== */
+const podpowiedzi = { ...podpowiedziMarki, ...podpowiedziRzeczy };
 
 /* ===== ZAPAMIĘTYWANIE USTAWIEN ===== */
 function zapiszUstawienia() {
@@ -270,7 +312,7 @@ btnPokaz.onclick = () => {
     }
     else if (impostorzy.includes(aktualny)) {
         oszust.innerText = "JESTEŚ OSZUSTEM!";
-        haslo.innerText = podpowiedziMarki[slowo] || "❌ BRAK HASŁA";
+        haslo.innerText = podpowiedzi[slowo] || "❌ BRAK HASŁA";
     }
     else {
         haslo.innerText = slowo;
