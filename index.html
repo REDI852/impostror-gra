@@ -45,6 +45,7 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
     </select>
 
     <button id="btnStart">Graj</button>
+    <button id="btnReset">Wyczyść ustawienia</button>  <!-- ←←← Nowy przycisk -->
 
     <div class="kategorie" id="kategorieBox"></div>
 </div>
@@ -283,7 +284,7 @@ btnStart.onclick = () => {
     }
 
     jester = null;
-    if (Math.random() < 0.2) {
+    if (Math.random() < 0.2) {  // ←←← Zmniejszone prawdopodobieństwo jestera (z 0.3 na 0.2)
         do { jester = Math.floor(Math.random() * liczbaGraczy); }
         while (impostorzy.includes(jester));
     }
@@ -332,7 +333,12 @@ btnDalej.onclick = () => {
 // Wczytaj zapisane ustawienia po załadowaniu strony
 wczytajUstawienia();
 
+// Obsługa resetu ustawień
+document.getElementById("btnReset").onclick = () => {
+    localStorage.removeItem("tajniak_config");  // Usuń zapis
+    location.reload();  // Odśwież stronę
+};
+
 </script>
 </body>
 </html>
-
