@@ -23,7 +23,6 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
 </style>
 </head>
 <body>
-
 <h2>Tajniak</h2>
 
 <div id="start">
@@ -46,6 +45,7 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
     </select>
 
     <button id="btnStart">Graj</button>
+
     <div class="kategorie" id="kategorieBox"></div>
 </div>
 
@@ -62,11 +62,11 @@ let liczbaGraczy, aktualny=0, impostorzy=[], slowo, imiona=[], jester=null;
 
 /* ===== KATEGORIE ===== */
 const kategorie = {
-    mikolow:["rynek","trąbka","dworzec","silver","fresh","szkoła 1","szkoła 3"],
-    miejsca:["działka","bielsko","istebna","passat","lodowisko"],
-    swieta:["piernik","mikołaj","mandarynki","uszka","opłatek"],
-    filmy:["Titanic","Matrix","Breaking Bad","Incepcja","Interstellar","Dark","Gra o Tron","Avatar","Star Wars","Furioza","Narcos"],
-    marki:[
+    mikolow: ["rynek","trąbka","dworzec","silver","fresh","szkoła 1","szkoła 3"],
+    miejsca: ["działka","bielsko","istebna","passat","lodowisko"],
+    swieta: ["piernik","mikołaj","mandarynki","uszka","opłatek"],
+    filmy: ["Titanic","Matrix","Breaking Bad","Incepcja","Interstellar","Dark","Gra o Tron","Avatar","Star Wars","Furioza","Narcos"],
+    marki: [
         "apple","ferrari","orbit","Axe","dyson","zelmer","level up","simens","bmw","tymbark",
         "perwol","pampers","sony","tesla","cat","sprite","ibuprom","wołga","star",
         "legia warszawa","real madryt","orange","T mobil","tauron","panasonic",
@@ -80,7 +80,7 @@ const kategorie = {
 
 /* ===== PODPOWIEDZI MARKI ===== */
 const podpowiedziMarki = {
-apple: "przereklamowany",
+    apple: "przereklamowany",
     ferrari: "czerwony",
     orbit: "oddech",
     Axe: "zapach",
@@ -152,72 +152,144 @@ apple: "przereklamowany",
     gopro: "akcja"
 };
 
-/* ===== RENDER ===== */
+/* ===== ZAPAMIĘTYWANIE USTAWIEN ===== */
+function zapiszUstawienia() {
+    const dane = {
+        gracze: liczbaGraczy,
+        imiona: imiona,
+        tryb: document.getElementById("trybImpostora").value,
+        kategorie: Array.from(document.querySelectorAll(".kat:checked")).map(ch => ch.value)
+    };
+    localStorage.setItem("tajniak_config", JSON.stringify(dane));
+}
+
+function wczytajUstawienia() {
+    const zapis = localStorage.getItem("tajniak_config");
+    if (!zapis) return;
+
+    try {
+        const dane = JSON.parse(zapis);
+
+        // ilość graczy
+        document.getElementById("gracze").value = dane.gracze || 5;
+
+        // imiona
+        const inputy = document.querySelectorAll("#imionaBox input");
+        (dane.imiona || []).forEach((imie, i) => {
+            if (inputy[i]) inputy[i].value = imie;
+        });
+
+        // tryb impostora
+        if (dane.tryb) {
+            document.getElementById("trybImpostora").value = dane.tryb;
+        }
+
+        // kategorie
+        document.querySelectorAll(".kat").forEach(checkbox => {
+            if (dane.kategorie.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+
+        // odśwież wygląd checkboxów (kolory)
+        document.querySelectorAll(".kat").forEach(ch => {
+            const span = ch.nextElementSibling;
+            if (span) {
+                span.style.background = ch.checked ? "#4caf50" : "#b6f0b6";
+                span.style.color = ch.checked ? "#fff" : "";
+            }
+        });
+
+    } catch (e) {
+        console.warn("Błąd wczytywania zapisanej konfiguracji", e);
+    }
+}
+
+/* ===== RENDER KATEGORII ===== */
 function renderKategorie(){
-    const box=document.getElementById("kategorieBox");
-    box.innerHTML="<p><strong>Wybierz kategorie:</strong></p>";
-    Object.keys(kategorie).forEach(k=>{
-        box.innerHTML+=`<label><input type="checkbox" class="kat" value="${k}"><span>${k}</span></label>`;
+    const box = document.getElementById("kategorieBox");
+    box.innerHTML = "<p><strong>Wybierz kategorie:</strong></p>";
+    Object.keys(kategorie).forEach(k => {
+        box.innerHTML += `<label><input type="checkbox" class="kat" value="${k}"><span>${k}</span></label>`;
     });
 }
 renderKategorie();
 
-/* ===== START ===== */
-btnStart.onclick=()=>{
-    liczbaGraczy=+gracze.value;
-    imiona=[...document.querySelectorAll("#imionaBox input")]
-        .slice(0,liczbaGraczy)
-        .map((i,n)=>i.value||`Gracz ${n+1}`);
+/* ===== START GRY ===== */
+btnStart.onclick = () => {
+    liczbaGraczy = +gracze.value;
+    imiona = [...document.querySelectorAll("#imionaBox input")]
+        .slice(0, liczbaGraczy)
+        .map((i, n) => i.value.trim() || `Gracz ${n+1}`);
 
-    let lista=[];
-    document.querySelectorAll(".kat:checked").forEach(k=>lista=lista.concat(kategorie[k.value]));
-    slowo=lista[Math.floor(Math.random()*lista.length)];
+    let lista = [];
+    document.querySelectorAll(".kat:checked").forEach(k => lista = lista.concat(kategorie[k.value]));
 
-    impostorzy=[];
-    let ilosc=trybImpostora.value==="losowo"?(Math.random()<0.5?1:2):+trybImpostora.value;
-    while(impostorzy.length<ilosc){
-        let i=Math.floor(Math.random()*liczbaGraczy);
-        if(!impostorzy.includes(i))impostorzy.push(i);
+    if (lista.length === 0) {
+        alert("Wybierz przynajmniej jedną kategorię!");
+        return;
     }
 
-    jester=null;
-    if(Math.random()<0.3){
-        do{ jester=Math.floor(Math.random()*liczbaGraczy); }
-        while(impostorzy.includes(jester));
+    slowo = lista[Math.floor(Math.random() * lista.length)];
+
+    impostorzy = [];
+    let ilosc = trybImpostora.value === "losowo" ? (Math.random() < 0.5 ? 1 : 2) : +trybImpostora.value;
+
+    while (impostorzy.length < ilosc) {
+        let i = Math.floor(Math.random() * liczbaGraczy);
+        if (!impostorzy.includes(i)) impostorzy.push(i);
     }
 
-    aktualny=0;
-    start.style.display="none";
-    gra.style.display="block";
+    jester = null;
+    if (Math.random() < 0.3) {
+        do { jester = Math.floor(Math.random() * liczbaGraczy); }
+        while (impostorzy.includes(jester));
+    }
+
+    aktualny = 0;
+
+    zapiszUstawienia();   // <--- ZAPISUJEMY USTAWIENIA
+
+    start.style.display = "none";
+    gra.style.display = "block";
     pokazInfo();
 };
 
-/* ===== GRA ===== */
+/* ===== EKRAN GRY ===== */
 function pokazInfo(){
-    info.innerText=imiona[aktualny];
-    haslo.innerText="";
-    oszust.innerText="";
-    btnDalej.style.display="none";
+    info.innerText = imiona[aktualny];
+    haslo.innerText = "";
+    oszust.innerText = "";
+    btnDalej.style.display = "none";
 }
 
-btnPokaz.onclick=()=>{
-    if(aktualny===jester){
-        oszust.innerText="JESTER – MUSISZ ODPAŚĆ JAKO PIERWSZY";
-        haslo.innerText="🤡";
+btnPokaz.onclick = () => {
+    if (aktualny === jester) {
+        oszust.innerText = "JESTER – MUSISZ ODPAŚĆ JAKO PIERWSZY";
+        haslo.innerText = "🤡";
     }
-    else if(impostorzy.includes(aktualny)){
-        oszust.innerText="JESTEŚ OSZUSTEM!";
-        haslo.innerText=podpowiedziMarki[slowo]||"❌ BRAK HASŁA";
+    else if (impostorzy.includes(aktualny)) {
+        oszust.innerText = "JESTEŚ OSZUSTEM!";
+        haslo.innerText = podpowiedziMarki[slowo] || "❌ BRAK HASŁA";
     }
-    else haslo.innerText=slowo;
-
-    btnDalej.style.display="inline";
+    else {
+        haslo.innerText = slowo;
+    }
+    btnDalej.style.display = "inline";
 };
 
-btnDalej.onclick=()=>{
+btnDalej.onclick = () => {
     aktualny++;
-    aktualny>=liczbaGraczy?location.reload():pokazInfo();
+    if (aktualny >= liczbaGraczy) {
+        location.reload();
+    } else {
+        pokazInfo();
+    }
 };
+
+// Wczytaj zapisane ustawienia po załadowaniu strony
+wczytajUstawienia();
+
 </script>
 </body>
 </html>
