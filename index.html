@@ -285,7 +285,7 @@ btnStart.onclick = () => {
     }
 
     jester = null;
-    if (Math.random() < 0.1) {  // ←←← Zmniejszone prawdopodobieństwo jestera (z 0.3 na 0.2)
+    if (Math.random() < 0.3) {  // ←←← Zmniejszone prawdopodobieństwo jestera (z 0.3 na 0.2)
         do { jester = Math.floor(Math.random() * liczbaGraczy); }
         while (impostorzy.includes(jester));
     }
@@ -343,4 +343,5 @@ document.getElementById("btnReset").onclick = () => {
 </script>
 </body>
 </html>
+
 
