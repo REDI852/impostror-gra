@@ -3,15 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <title>Tajniak</title>
+
 <style>
-body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-input, select { width: 90%; font-size: 16px; padding: 5px; margin:4px 0; }
-button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer; }
-#haslo { font-size: 28px; margin-top: 10px; }
-#oszust { font-weight: bold; margin-top: 15px; }
-.kategorie { margin-top: 30px; }
-.kategorie label { display: inline-block; margin: 6px; }
-.kategorie input { display: none; }
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+input, select {
+    width: 90%;
+    font-size: 16px;
+    padding: 5px;
+    margin: 4px 0;
+}
+button {
+    font-size: 18px;
+    padding: 10px 25px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+#haslo {
+    font-size: 28px;
+    margin-top: 10px;
+}
+#oszust {
+    font-weight: bold;
+    margin-top: 15px;
+}
+.kategorie {
+    margin-top: 30px;
+}
+.kategorie label {
+    display: inline-block;
+    margin: 6px;
+}
+.kategorie input {
+    display: none;
+}
 .kategorie span {
     padding: 10px 16px;
     border-radius: 8px;
@@ -19,9 +47,13 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
     font-weight: bold;
     cursor: pointer;
 }
-.kategorie input:checked + span { background:#4caf50; color:#fff; }
+.kategorie input:checked + span {
+    background: #4caf50;
+    color: #fff;
+}
 </style>
 </head>
+
 <body>
 
 <h2>Tajniak</h2>
@@ -32,9 +64,15 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
 
     <div id="imionaBox">
         <p><strong>Imiona graczy:</strong></p>
-        <input placeholder="Gracz 1"><input placeholder="Gracz 2"><input placeholder="Gracz 3">
-        <input placeholder="Gracz 4"><input placeholder="Gracz 5"><input placeholder="Gracz 6">
-        <input placeholder="Gracz 7"><input placeholder="Gracz 8"><input placeholder="Gracz 9">
+        <input placeholder="Gracz 1">
+        <input placeholder="Gracz 2">
+        <input placeholder="Gracz 3">
+        <input placeholder="Gracz 4">
+        <input placeholder="Gracz 5">
+        <input placeholder="Gracz 6">
+        <input placeholder="Gracz 7">
+        <input placeholder="Gracz 8">
+        <input placeholder="Gracz 9">
         <input placeholder="Gracz 10">
     </div>
 
@@ -60,15 +98,15 @@ button { font-size: 18px; padding: 10px 25px; margin-top: 15px; cursor: pointer;
 </div>
 
 <script>
-let liczbaGraczy, aktualny=0, impostorzy=[], slowo, imiona=[], jester=null;
+let liczbaGraczy, aktualny = 0, impostorzy = [], slowo, imiona = [], jester = null;
 
 /* ===== KATEGORIE ===== */
 const kategorie = {
-    mikolow:["rynek","trąbka","dworzec","silver","fresh","szkoła 1","szkoła 3"],
-    miejsca:["działka","bielsko","istebna","passat","lodowisko"],
-    swieta:["piernik","mikołaj","mandarynki","uszka","opłatek"],
-    filmy:["Titanic","Matrix","Breaking Bad","Incepcja","Interstellar","Dark","Gra o Tron","Avatar","Star Wars","Furioza","Narcos"],
-    marki:[
+    mikolow: ["rynek","trąbka","dworzec","silver","fresh","szkoła 1","szkoła 3"],
+    miejsca: ["działka","bielsko","istebna","passat","lodowisko"],
+    swieta: ["piernik","mikołaj","mandarynki","uszka","opłatek"],
+    filmy: ["Titanic","Matrix","Breaking Bad","Incepcja","Interstellar","Dark","Gra o Tron","Avatar","Star Wars","Furioza","Narcos"],
+    marki: [
         "apple","ferrari","orbit","Axe","dyson","zelmer","level up","simens","bmw","tymbark",
         "perwol","pampers","sony","tesla","cat","sprite","ibuprom","wołga","star",
         "legia warszawa","real madryt","orange","T mobil","tauron","panasonic",
@@ -78,20 +116,21 @@ const kategorie = {
         "shell","orlen","nerf","lidl","zalando","aliexpress","temu","twitch","reddit",
         "cd projekt","oreo","pringles","ikea","canon","gopro"
     ],
-    rzeczy:[
-        "krzesło","stół","lampa","telefon","komputer","książka","długopis","okno","drzwi","samochód",
-        "rower","butelka","szklanka","widelec","nóż","łyżka","telewizor","lodówka","pralka","kuchenka",
-        "łóżko","poduszka","kołdra","lustro","zegar","parasol","torebka","portfel","klucze","okulary"
+    rzeczy: [
+        "krzesło","stół","lampa","telefon","komputer","książka","długopis","okno","drzwi",
+        "samochód","rower","butelka","szklanka","widelec","nóż","łyżka","telewizor","lodówka",
+        "pralka","kuchenka","łóżko","poduszka","kołdra","lustro","zegar","parasol","torebka",
+        "portfel","klucze","okulary"
     ]
 };
 
 /* ===== PODPOWIEDZI ===== */
 const podpowiedzi = {
-    apple:"przereklamowany", ferrari:"czerwony", orbit:"oddech", Axe:"zapach", dyson:"baterie",
-    zelmer:"kuchnia", "level up":"kiedyś klasa", simens:"fabryka", bmw:"niemiecki",
-    tymbark:"kartonik", perwol:"delikatne", pampers:"przyjemność", sony:"ekran",
-    tesla:"prąd", cat:"żółte", sprite:"bąbelki", ibuprom:"ból", wołga:"stare",
-    star:"ciężkie", "legia warszawa":"ostrze", "real madryt":"galaktyczni",
+    apple:"przereklamowany", ferrari:"czerwony", orbit:"oddech", Axe:"zapach",
+    dyson:"baterie", zelmer:"kuchnia", "level up":"kiedyś klasa", simens:"fabryka",
+    bmw:"niemiecki", tymbark:"kartonik", perwol:"delikatne", pampers:"przyjemność",
+    sony:"ekran", tesla:"prąd", cat:"żółte", sprite:"bąbelki", ibuprom:"ból",
+    wołga:"stare", star:"ciężkie", "legia warszawa":"ostrze", "real madryt":"galaktyczni",
     orange:"sieć", "T mobil":"różowe", tauron:"energia", panasonic:"sprzęt",
     nike:"skrzydło", adidas:"trzy paski", "coca cola":"święta", pepsi:"niebieskie",
     lego:"plastik", samsung:"android", hp:"drukarka", intel:"procesor",
@@ -104,92 +143,135 @@ const podpowiedzi = {
     zalando:"paczka", aliexpress:"długo", temu:"reklamy", twitch:"live",
     reddit:"forum", "cd projekt":"polska", oreo:"ciastko", pringles:"tuba",
     ikea:"szwedzkie", canon:"obiektyw", gopro:"akcja",
-
     krzesło:"nogi", stół:"centrum wydarzeń", lampa:"wieczór", telefon:"wibracja",
-    komputer:"klawiatura", książka:"cisza", długopis:"egzamin", okno:"ucieczka",
+    komputer:"klawiatura", książka:"cisza", długopis:"duda", okno:"ucieczka",
     drzwi:"granica", samochód:"korek", rower:"łańcuch", butelka:"zakrętka",
     szklanka:"krucha", widelec:"metal", nóż:"ostrożnie", łyżka:"okrągła",
-    telewizor:"pilot", lodówka:"nocne wizyty", pralka:"wirowanie", kuchenka:"gaz",
-    łóżko:"rano", poduszka:"kształt", kołdra:"zimą", lustro:"prawda",
-    zegar:"tykanie", parasol:"nagła decyzja", torebka:"bałagan", portfel:"pustka",
-    klucze:"brzęk", okulary:"szkło"
+    telewizor:"pilot", lodówka:"nocne wizyty", pralka:"wirowanie",
+    kuchenka:"gaz", łóżko:"rano", poduszka:"kształt", kołdra:"zimą",
+    lustro:"prawda", zegar:"tykanie", parasol:"nagła decyzja",
+    torebka:"bałagan", portfel:"pustka", klucze:"brzęk", okulary:"szkło"
 };
 
-/* ===== RENDER ===== */
-function renderKategorie(){
-    const box=document.getElementById("kategorieBox");
-    box.innerHTML="<p><strong>Wybierz kategorie:</strong></p>";
-    Object.keys(kategorie).forEach(k=>{
-        box.innerHTML+=`<label><input type="checkbox" class="kat" value="${k}"><span>${k}</span></label>`;
+/* ===== ZAPIS / ODCZYT ===== */
+function zapiszUstawienia() {
+    const dane = {
+        gracze: liczbaGraczy,
+        imiona: imiona,
+        tryb: trybImpostora.value,
+        kategorie: [...document.querySelectorAll(".kat:checked")].map(x => x.value)
+    };
+    localStorage.setItem("tajniak_config", JSON.stringify(dane));
+}
+
+function wczytajUstawienia() {
+    const zapis = localStorage.getItem("tajniak_config");
+    if (!zapis) return;
+    const dane = JSON.parse(zapis);
+
+    gracze.value = dane.gracze || 5;
+
+    document.querySelectorAll("#imionaBox input").forEach((i, idx) => {
+        if (dane.imiona && dane.imiona[idx]) i.value = dane.imiona[idx];
+    });
+
+    if (dane.tryb) trybImpostora.value = dane.tryb;
+
+    document.querySelectorAll(".kat").forEach(ch => {
+        if (dane.kategorie?.includes(ch.value)) ch.checked = true;
     });
 }
+
+/* ===== KATEGORIE ===== */
+function renderKategorie() {
+    const box = document.getElementById("kategorieBox");
+    box.innerHTML = "<p><strong>Wybierz kategorie:</strong></p>";
+    Object.keys(kategorie).forEach(k => {
+        box.innerHTML += `
+            <label>
+                <input type="checkbox" class="kat" value="${k}">
+                <span>${k}</span>
+            </label>
+        `;
+    });
+}
+
 renderKategorie();
+wczytajUstawienia();
 
 /* ===== START ===== */
-btnStart.onclick=()=>{
-    liczbaGraczy=+gracze.value;
-    imiona=[...document.querySelectorAll("#imionaBox input")]
-        .slice(0,liczbaGraczy)
-        .map((i,n)=>i.value||`Gracz ${n+1}`);
+btnStart.onclick = () => {
+    liczbaGraczy = +gracze.value;
 
-    let lista=[];
-    document.querySelectorAll(".kat:checked").forEach(k=>lista=lista.concat(kategorie[k.value]));
-    if(!lista.length){alert("Wybierz kategorię");return;}
+    imiona = [...document.querySelectorAll("#imionaBox input")]
+        .slice(0, liczbaGraczy)
+        .map((i, n) => i.value.trim() || `Gracz ${n+1}`);
 
-    slowo=lista[Math.floor(Math.random()*lista.length)];
+    let lista = [];
+    document.querySelectorAll(".kat:checked").forEach(k => {
+        lista = lista.concat(kategorie[k.value]);
+    });
 
-    impostorzy=[];
-    let ilosc=trybImpostora.value==="losowo"?(Math.random()<0.5?1:2):+trybImpostora.value;
-    while(impostorzy.length<ilosc){
-        let i=Math.floor(Math.random()*liczbaGraczy);
-        if(!impostorzy.includes(i))impostorzy.push(i);
+    if (!lista.length) return alert("Wybierz kategorię!");
+
+    slowo = lista[Math.floor(Math.random() * lista.length)];
+
+    impostorzy = [];
+    let ilosc = trybImpostora.value === "losowo"
+        ? (Math.random() < 0.5 ? 1 : 2)
+        : +trybImpostora.value;
+
+    while (impostorzy.length < ilosc) {
+        let i = Math.floor(Math.random() * liczbaGraczy);
+        if (!impostorzy.includes(i)) impostorzy.push(i);
     }
 
-    jester=null;
-    if(Math.random()<0.3){
-        do{jester=Math.floor(Math.random()*liczbaGraczy);}
-        while(impostorzy.includes(jester));
+    jester = null;
+    if (Math.random() < 0.3) {
+        do {
+            jester = Math.floor(Math.random() * liczbaGraczy);
+        } while (impostorzy.includes(jester));
     }
 
-    aktualny=0;
-    start.style.display="none";
-    gra.style.display="block";
+    aktualny = 0;
+    zapiszUstawienia();
+    start.style.display = "none";
+    gra.style.display = "block";
     pokazInfo();
 };
 
 /* ===== GRA ===== */
-function pokazInfo(){
-    info.innerText=imiona[aktualny];
-    haslo.innerText="";
-    oszust.innerText="";
-    btnDalej.style.display="none";
+function pokazInfo() {
+    info.innerText = imiona[aktualny];
+    haslo.innerText = "";
+    oszust.innerText = "";
+    btnDalej.style.display = "none";
 }
 
-btnPokaz.onclick=()=>{
-    if(aktualny===jester){
-        oszust.innerText="JESTER – MUSISZ ODPAŚĆ JAKO PIERWSZY";
-        haslo.innerText=slowo;
+btnPokaz.onclick = () => {
+    if (aktualny === jester) {
+        oszust.innerText = "JESTER🤡 – MUSISZ ODPAŚĆ JAKO PIERWSZY";
+        haslo.innerText = slowo;
+    } else if (impostorzy.includes(aktualny)) {
+        oszust.innerText = "JESTEŚ OSZUSTEM!";
+        haslo.innerText = podpowiedzi[slowo] || "❌";
+    } else {
+        haslo.innerText = slowo;
     }
-    else if(impostorzy.includes(aktualny)){
-        oszust.innerText="JESTEŚ OSZUSTEM!";
-        haslo.innerText=podpowiedzi[slowo]||"❌ BRAK HASŁA";
-    }
-    else{
-        haslo.innerText=slowo;
-    }
-    btnDalej.style.display="inline";
+    btnDalej.style.display = "inline";
 };
 
-btnDalej.onclick=()=>{
+btnDalej.onclick = () => {
     aktualny++;
-    if(aktualny>=liczbaGraczy)location.reload();
+    if (aktualny >= liczbaGraczy) location.reload();
     else pokazInfo();
 };
 
-btnReset.onclick=()=>{
-    localStorage.clear();
+btnReset.onclick = () => {
+    localStorage.removeItem("tajniak_config");
     location.reload();
 };
 </script>
+
 </body>
 </html>
