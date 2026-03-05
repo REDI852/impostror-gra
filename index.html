@@ -254,7 +254,7 @@ btnPokaz.onclick = () => {
         haslo.innerText = slowo;
     } else if (impostorzy.includes(aktualny)) {
         oszust.innerText = "JESTEŚ OSZUSTEM!czyli impostorem który impostoruje ";
-        haslo.innerText = podpowiedzi[slowo] || "❌nie masz hasła bo jestes impostorem!!!!!!";
+       haslo.innerText = "⚠ PODPOWIEDŹ NADAL JESTEŚ IMPOSTOREM: " + (podpowiedzi[slowo] || "BRAK hasła bo jestes impostorem")
     } else {
         haslo.innerText = slowo;
     }
@@ -275,4 +275,5 @@ btnReset.onclick = () => {
 
 </body>
 </html>
+
 
